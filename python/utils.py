@@ -1,15 +1,22 @@
 import os
 import asyncio
-import concurrent.futures
-import multiprocessing
-from typing import List
 from google.cloud import storage
 from google.oauth2 import service_account
+from google.api_core import exceptions as google_exceptions
 
 def create_storage_client(key_path: str) -> storage.Client:
     credentials = service_account.Credentials.from_service_account_file(key_path)
     return storage.Client(credentials=credentials)
 
+def upload_file(storage_client: storage.Client, bucket_name: str, data_dir: str, csv_file: str) -> str:
+    source_file_path = os.path.join(data_dir, csv_file)
+    if not os.path.exists(source_file_path):
+        return f"File not found: {source_file_path}"
+    
+    try:
+        upload_blob(storage_client, bucket_name, source_file_path)
+    except Exception as e:
+        return f"Error uploading {csv_file}: {str(e)}"
 
 def upload_blob(storage_client: storage.Client, bucket_name: str, source_file_path: str) -> None:
     """
@@ -28,15 +35,14 @@ def upload_blob(storage_client: storage.Client, bucket_name: str, source_file_pa
         source_filename = os.path.basename(source_file_path)
         blob = bucket.blob(source_filename)
         blob.upload_from_filename(source_file_path)
-    except storage.exceptions.NotFound:
+    except google_exceptions.NotFound:
         print(f"Error: Bucket '{bucket_name}' not found.")
     except FileNotFoundError:
         print(f"Error: Source file '{source_file_path}' not found.")
-    except storage.exceptions.GoogleCloudError as e:
+    except google_exceptions.GoogleAPIError as e:
         print(f"Error uploading file: {e}")
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
-
 
 async def upload_blob_async(storage_client: storage.Client, bucket_name: str, source_file_path: str) -> None:
     """
@@ -53,50 +59,30 @@ async def upload_blob_async(storage_client: storage.Client, bucket_name: str, so
     loop = asyncio.get_running_loop()
     await loop.run_in_executor(None, upload_blob, storage_client, bucket_name, source_file_path)
 
-def serial_upload(storage_client: storage.Client, bucket_name: str, data_dir: str, csv_files: List[str]) -> None:
-    for csv_file in csv_files:
-        source_file_path = os.path.join(data_dir, csv_file)
-        if os.path.exists(source_file_path):
-            upload_blob(storage_client, bucket_name, source_file_path)
-        else:
-            print(f"File not found: {source_file_path}")
+async def upload_file_async(storage_client: storage.Client, bucket_name: str, data_dir: str, csv_file: str) -> str:
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(None, upload_file, storage_client, bucket_name, data_dir, csv_file)
 
-async def async_upload(storage_client: storage.Client, bucket_name: str, data_dir: str, csv_files: List[str]) -> None:
-    for csv_file in csv_files:
-        source_file_path = os.path.join(data_dir, csv_file)
-        if os.path.exists(source_file_path):
-            await upload_blob_async(storage_client, bucket_name, source_file_path)
-        else:
-            print(f"File not found: {source_file_path}")
+def delete_all_blobs(storage_client: storage.Client, bucket_name: str) -> None:
+    """
+    Deletes all blobs (files) in the specified Google Cloud Storage bucket.
 
-def multithreading_upload(storage_client: storage.Client, bucket_name: str, data_dir: str, csv_files: List[str]) -> None:
-    def upload_file(csv_file: str) -> None:
-        source_file_path = os.path.join(data_dir, csv_file)
-        if os.path.exists(source_file_path):
-            upload_blob(storage_client, bucket_name, source_file_path)
-        else:
-            print(f"File not found: {source_file_path}")
+    Args:
+        storage_client (storage.Client): The Google Cloud Storage client.
+        bucket_name (str): The name of the bucket to clear.
 
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        executor.map(upload_file, csv_files)
-
-# def multiprocessing_upload(key_path: str, bucket_name: str, data_dir: str, csv_files: List[str]) -> None:
-#     def upload_file(args):
-#         storage_client, csv_file = args
-#         source_file_path = os.path.join(data_dir, csv_file)
-#         if os.path.exists(source_file_path):
-#             try:
-#                 upload_blob(storage_client, bucket_name, source_file_path)
-#                 return f"Uploaded {csv_file}"
-#             except Exception as e:
-#                 return f"Failed to upload {csv_file}: {str(e)}"
-#         else:
-#             return f"File not found: {source_file_path}"
-
-#     storage_client = create_storage_client(key_path)
-    
-#     with multiprocessing.Pool() as pool:
-#         results = pool.map(upload_file, [(storage_client, csv_file) for csv_file in csv_files])
-    
-#     for result in results:
-#         print(result)
+    Returns:
+        None
+    """
+    try:
+        bucket = storage_client.bucket(bucket_name)
+        blobs = bucket.list_blobs()
+        for blob in blobs:
+            blob.delete()
+        print(f"All files in bucket '{bucket_name}' have been deleted.")
+    except google_exceptions.NotFound:
+        print(f"Error: Bucket '{bucket_name}' not found.")
+    except google_exceptions.GoogleAPIError as e:
+        print(f"Error deleting files: {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
