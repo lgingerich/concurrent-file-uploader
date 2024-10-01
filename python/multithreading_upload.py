@@ -22,8 +22,7 @@ def multithreading_upload(storage_client: storage.Client, bucket_name: str, data
             print(f"File not found: {source_file_path}")
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = [executor.submit(upload_file, csv_file) for csv_file in csv_files]
-        concurrent.futures.wait(futures)
+        executor.map(upload_file, csv_files)
 
 def upload_blob(storage_client: storage.Client, bucket_name: str, source_file_path: str) -> None:
     """
