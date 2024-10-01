@@ -73,7 +73,8 @@ This will run the benchmarks for different upload methods and display the result
 
 | Upload Method | Run 1 (s) | Run 2 (s) | Run 3 (s) | Average (s) |
 |---------------|-----------|-----------|-----------|-------------|
-| Sequential    | 89.14          |           |           |             |
+| Serial    | 89.14          |           |           |             |
+| Async    | 89.14          |           |           |             |
 | MultiThreading| 40.20          |           |           |             |
 | Multiprocessing |           |           |           |             |
 

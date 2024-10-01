@@ -2,7 +2,7 @@ import os
 from typing import List
 from google.cloud import storage
 
-def sequential_upload(storage_client: storage.Client, bucket_name: str, data_dir: str, csv_files: List[str]) -> None:
+def serial_upload(storage_client: storage.Client, bucket_name: str, data_dir: str, csv_files: List[str]) -> None:
     """
     Uploads multiple CSV files to the specified bucket.
 

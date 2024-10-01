@@ -1,9 +1,11 @@
 import os
 import time
+import asyncio
 from google.cloud import storage
 from dotenv import load_dotenv
 from google.oauth2 import service_account
-from sequential_upload import sequential_upload
+from serial_upload import serial_upload
+from async_upload import async_upload
 from multithreading_upload import multithreading_upload
 from multiprocessing_upload import multiprocessing_upload
 
@@ -41,6 +43,9 @@ def run_benchmarks(upload_functions):
         result = run_single_benchmark(name, func)
         print_results(name, result)
 
+def run_async_upload(storage_client, bucket_name, data_dir, csv_files):
+    asyncio.run(async_upload(storage_client, bucket_name, data_dir, csv_files))
+
 def main():
     # Setup client
     storage_client = create_storage_client(KEY_PATH)
@@ -50,9 +55,11 @@ def main():
     
     # Define upload functions with common parameters
     upload_functions = [
-        ("Sequential (Python)", lambda: sequential_upload(storage_client, bucket_name, DATA_DIR, csv_files)),
-        ("Multithreading (Python)", lambda: multithreading_upload(storage_client, bucket_name, DATA_DIR, csv_files)),
+        # ("Serial (Python)", lambda: serial_upload(storage_client, bucket_name, DATA_DIR, csv_files)),
+        ("Async (Python)", lambda: run_async_upload(storage_client, bucket_name, DATA_DIR, csv_files)),
+        # ("Multithreading (Python)", lambda: multithreading_upload(storage_client, bucket_name, DATA_DIR, csv_files)),
         # ("Multiprocessing (Python)", lambda: multiprocessing_upload(storage_client, bucket_name, DATA_DIR, csv_files)),
+        
     ]
 
     # Run benchmarks
