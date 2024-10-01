@@ -4,7 +4,7 @@ from google.cloud import storage
 from dotenv import load_dotenv
 from google.oauth2 import service_account
 from sequential_upload import sequential_upload
-# from threaded_upload import threaded_upload
+from threaded_upload import threaded_upload
 # from multiprocessing_upload import multiprocessing_upload
 
 load_dotenv()
@@ -19,13 +19,16 @@ def create_storage_client(key_path):
     )
     return storage.Client(credentials=credentials)
 
-def run_single_benchmark(upload_func, num_runs=1):
+def run_single_benchmark(name, upload_func, num_runs=1):
     total_time = 0
-    for _ in range(num_runs):
+    for run in range(1, num_runs + 1):
+        print(f"Starting {name} - Run {run}/{num_runs}")
         start_time = time.time()
         upload_func()
         end_time = time.time()
-        total_time += end_time - start_time
+        run_time = end_time - start_time
+        total_time += run_time
+        print(f"Finished {name} - Run {run}/{num_runs} in {run_time:.2f} seconds")
     
     return total_time / num_runs
 
@@ -35,7 +38,7 @@ def print_results(name, result):
 
 def run_benchmarks(upload_functions):
     for name, func in upload_functions:
-        result = run_single_benchmark(func)
+        result = run_single_benchmark(name, func)
         print_results(name, result)
 
 def main():
@@ -47,9 +50,9 @@ def main():
     
     # Define upload functions with common parameters
     upload_functions = [
-        ("Sequential (Python)", lambda: sequential_upload(storage_client, bucket_name, DATA_DIR, csv_files)),
-    #     # ("Threaded (Python)", lambda: threaded_upload(storage_client, bucket_name, DATA_DIR, csv_files)),
-    #     # ("Multiprocessing (Python)", lambda: multiprocessing_upload(storage_client, bucket_name, DATA_DIR, csv_files)),
+        # ("Sequential (Python)", lambda: sequential_upload(storage_client, bucket_name, DATA_DIR, csv_files)),
+        ("Threaded (Python)", lambda: threaded_upload(storage_client, bucket_name, DATA_DIR, csv_files)),
+        # ("Multiprocessing (Python)", lambda: multiprocessing_upload(storage_client, bucket_name, DATA_DIR, csv_files)),
     ]
 
     # Run benchmarks
