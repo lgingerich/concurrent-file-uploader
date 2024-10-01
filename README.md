@@ -71,15 +71,13 @@ This will run the benchmarks for different upload methods and display the result
 
 ## Benchmark Results
 
-Here's an example of what the benchmark results might look like:
+| Upload Method | Run 1 (s) | Run 2 (s) | Run 3 (s) | Average (s) |
+|---------------|-----------|-----------|-----------|-------------|
+| Sequential    | 89.14          |           |           |             |
+| MultiThreading| 40.20          |           |           |             |
+| Multiprocessing |           |           |           |             |
 
-| Upload Method | Average Run Time (seconds) |
-|---------------|----------------------------|
-| Sequential    | 120.5                      |
-| Threaded      | 45.2                       |
-| Multiprocessing | 40.8                     |
-
-Note: Actual results may vary depending on your hardware, network conditions, and GCS performance.
+System: Apple MacBook Pro M3 Max 14-Core CPU, 32 GB RAM
 
 ## Code Structure
 

@@ -4,8 +4,8 @@ from google.cloud import storage
 from dotenv import load_dotenv
 from google.oauth2 import service_account
 from sequential_upload import sequential_upload
-from threaded_upload import threaded_upload
-# from multiprocessing_upload import multiprocessing_upload
+from multithreading_upload import multithreading_upload
+from multiprocessing_upload import multiprocessing_upload
 
 load_dotenv()
 
@@ -50,8 +50,8 @@ def main():
     
     # Define upload functions with common parameters
     upload_functions = [
-        # ("Sequential (Python)", lambda: sequential_upload(storage_client, bucket_name, DATA_DIR, csv_files)),
-        ("Threaded (Python)", lambda: threaded_upload(storage_client, bucket_name, DATA_DIR, csv_files)),
+        ("Sequential (Python)", lambda: sequential_upload(storage_client, bucket_name, DATA_DIR, csv_files)),
+        ("Multithreading (Python)", lambda: multithreading_upload(storage_client, bucket_name, DATA_DIR, csv_files)),
         # ("Multiprocessing (Python)", lambda: multiprocessing_upload(storage_client, bucket_name, DATA_DIR, csv_files)),
     ]
 
