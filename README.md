@@ -1,8 +1,19 @@
 # Bulk File Upload Concurrency Test
 
 This project is a playground for testing concurrent programming applied to bulk file 
-upload to Google Cloud Storage (GCS). It compares different upload methods: sequential, 
-multithreading, and multiprocessing.
+upload to Google Cloud Storage (GCS). It compares different upload methods: serial, 
+async, multithreading, and multiprocessing.
+
+## Benchmark Results
+
+| Method           | Run 1 (s) | Run 2 (s) | Run 3 (s) | Average (s) |
+|------------------|-----------|-----------|-----------|-------------|
+| Serial           | 78.92     | 79.20     | 79.05     | 79.06       |
+| Async            | 45.41     | 51.37     | 49.30     | 48.69       |
+| Multithreading   | 50.34     | 51.92     | 40.83     | 47.70       |
+| Multiprocessing  | 38.36     | 43.84     | 41.36     | 41.18       |
+
+System: Apple MacBook Pro M3 Max 14-Core CPU, 32 GB RAM
 
 ## Setup
 
@@ -69,24 +80,12 @@ python python/main.py
 
 This will run the benchmarks for different upload methods and display the results.
 
-## Benchmark Results
-
-| Upload Method    | Run 1 (s) | Run 2 (s) | Run 3 (s) | Average (s) |
-|------------------|-----------|-----------|-----------|-------------|
-| Serial           | 78.92     | 79.20     | 79.05     | 79.06       |
-| Async            | 45.41     | 51.37     | 49.30     | 48.69       |
-| Multithreading   | 50.34     | 51.92     | 40.83     | 47.70       |
-| Multiprocessing  | 38.36     | 43.84     | 41.36     | 41.18       |
-
-System: Apple MacBook Pro M3 Max 14-Core CPU, 32 GB RAM
-
 ## Code Structure
 
 - `python/data_generator.py`: Generates test CSV files
 - `python/main.py`: Main script to run benchmarks
-- `python/sequential_upload.py`: Sequential upload implementation
-- `python/multithreading_upload.py`: Multithreading upload implementation
-- `python/multiprocessing_upload.py`: Multiprocessing upload implementation
+- `python/utils.py`: Utility functions for GCS operations
+- `python/benchmarks.py`: Implementation of different upload methods
 
 ## Customization
 

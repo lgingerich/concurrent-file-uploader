@@ -9,6 +9,7 @@ from benchmarks import (
     multiprocessing_upload
 )
 from utils import (
+    logger,
     create_storage_client,
     delete_all_blobs,
 )
@@ -23,7 +24,7 @@ def run_single_benchmark(name, upload_func, storage_client, bucket_name, num_run
     total_time = 0
     results = []
     for run in range(1, num_runs + 1):
-        print(f"\nStarting {name} - Run {run}/{num_runs}")
+        logger.info(f"Starting {name} - Run {run}/{num_runs}")
         delete_all_blobs(storage_client, bucket_name)
         start_time = time.time()
         upload_func()
@@ -31,7 +32,7 @@ def run_single_benchmark(name, upload_func, storage_client, bucket_name, num_run
         run_time = end_time - start_time
         total_time += run_time
         results.append(run_time)
-        print(f"Finished {name} - Run {run}/{num_runs}")
+        logger.info(f"Finished {name} - Run {run}/{num_runs}")
     
     average_time = total_time / num_runs
     return average_time, results
