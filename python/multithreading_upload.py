@@ -2,11 +2,10 @@ import concurrent.futures
 import os
 from typing import List
 from google.cloud import storage
-import threading
 
-def threaded_upload(storage_client: storage.Client, bucket_name: str, data_dir: str, csv_files: List[str]) -> None:
+def multithreading_upload(storage_client: storage.Client, bucket_name: str, data_dir: str, csv_files: List[str]) -> None:
     """
-    Uploads multiple CSV files to the specified bucket.
+    Uploads multiple CSV files to the specified bucket using multithreading.
 
     Args:
         storage_client: The Google Cloud Storage client.
