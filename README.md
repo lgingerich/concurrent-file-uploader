@@ -71,12 +71,12 @@ This will run the benchmarks for different upload methods and display the result
 
 ## Benchmark Results
 
-| Upload Method | Run 1 (s) | Run 2 (s) | Run 3 (s) | Average (s) |
-|---------------|-----------|-----------|-----------|-------------|
-| Serial    | 89.14          |           |           |             |
-| Async    | 89.14          |           |           |             |
-| MultiThreading| 40.20          |           |           |             |
-| Multiprocessing |           |           |           |             |
+| Upload Method    | Run 1 (s) | Run 2 (s) | Run 3 (s) | Average (s) |
+|------------------|-----------|-----------|-----------|-------------|
+| Serial           | 78.92     | 79.20     | 79.05     | 79.06       |
+| Async            | 45.41     | 51.37     | 49.30     | 48.69       |
+| Multithreading   | 50.34     | 51.92     | 40.83     | 47.70       |
+| Multiprocessing  | 38.36     | 43.84     | 41.36     | 41.18       |
 
 System: Apple MacBook Pro M3 Max 14-Core CPU, 32 GB RAM
 
